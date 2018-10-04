@@ -1,0 +1,6 @@
+<resources>
+    <declare-styleable name="CleanAnimationView">
+        <attr name="themeColor" format="color" />
+        <attr name="bubbleNum" format="integer"></attr>
+    </declare-styleable>
+</resources>
