@@ -1,6 +1,7 @@
 <resources>
-    <declare-styleable name="CleanAnimationView">
+    <declare-styleable name="CleanSwirlAnimationView">
         <attr name="themeColor" format="color" />
         <attr name="bubbleNum" format="integer"></attr>
+        <attr name="rate" format="float"></attr>
     </declare-styleable>
 </resources>

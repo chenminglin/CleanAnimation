@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_view_clean"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:background="@color/clean_view_theme"
+    tools:context=".SimpleActivity">
+
+    <com.chenminglin.cleananimation.CleanSwirlAnimationView
+        android:id="@+id/swirl_animation_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:bubbleNum="20"
+        app:rate="0.2"
+        app:themeColor="@color/clean_view_theme" />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center">
+
+        <TextView
+            android:id="@+id/txt_size"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/white"
+            android:textSize="50sp"
+            tools:text="40.12" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/txt_size"
+            android:layout_centerHorizontal="true"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/txt_unit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="3dp"
+                android:textColor="@android:color/white"
+                android:textSize="22sp"
+                tools:text="MB" />
+
+            <TextView
+                android:id="@+id/txt_junk"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="3dp"
+                android:text="@string/junk"
+
+                android:textColor="@android:color/white"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+    </RelativeLayout>
+</FrameLayout>

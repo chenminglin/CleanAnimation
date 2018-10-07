@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">CleanAnimation</string>
+
+    <string name="junk">垃圾</string>
 </resources>

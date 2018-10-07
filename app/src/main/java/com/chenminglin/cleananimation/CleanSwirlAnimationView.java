@@ -1,7 +1,5 @@
 package com.chenminglin.cleananimation;
 
-import android.animation.Animator;
-import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -13,13 +11,11 @@ import android.util.Log;
 import android.view.View;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 
-public class CleanAnimationView extends View {
+public class CleanSwirlAnimationView extends View {
 
     final String TAG = getClass().getSimpleName();
 
@@ -27,6 +23,7 @@ public class CleanAnimationView extends View {
     final float OVAL1_DEFAULT_DEGREES = -15F;
     final float OVAL2_DEFAULT_DEGREES = -60F;
     final float OVAL3_DEFAULT_DEGREES = -135F;
+    float mRate = 1;
 
     final int BUBBLE_DEFAULT_NUM = 50;
 
@@ -43,12 +40,9 @@ public class CleanAnimationView extends View {
 
     List<CleanBubble> mBubbles = new ArrayList<>();
 
-    ValueAnimator mAnimator;
-
-
     Paint mPaint;
 
-    int mCenterW;
+    int mCenterX;
     int mCenterY;
 
     int mOuterCircleColor = Color.parseColor("#30FFFFFF");
@@ -75,20 +69,25 @@ public class CleanAnimationView extends View {
 
 
 
-    public CleanAnimationView(Context context) {
+//    Camera mCamera;
+//    Matrix mMatrix;
+//    float mCameraZ;
+
+
+    public CleanSwirlAnimationView(Context context) {
         super(context);
         init(null, 0);
 
 
     }
 
-    public CleanAnimationView(Context context, AttributeSet attrs) {
+    public CleanSwirlAnimationView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(attrs, 0);
 
     }
 
-    public CleanAnimationView(Context context, AttributeSet attrs, int defStyle) {
+    public CleanSwirlAnimationView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init(attrs, defStyle);
     }
@@ -96,21 +95,27 @@ public class CleanAnimationView extends View {
     private void init(AttributeSet attrs, int defStyle) {
         // Load attributes
         final TypedArray a = getContext().obtainStyledAttributes(
-                attrs, R.styleable.CleanAnimationView, defStyle, 0);
+                attrs, R.styleable.CleanSwirlAnimationView, defStyle, 0);
 
 
-        mCenterCircleColor = a.getColor(R.styleable.CleanAnimationView_themeColor, DEFAULT_COLOR);
-        setBackgroundColor(mCenterCircleColor);
+        mCenterCircleColor = a.getColor(R.styleable.CleanSwirlAnimationView_themeColor, DEFAULT_COLOR);
 
-        mBubbleNum = a.getInt(R.styleable.CleanAnimationView_bubbleNum, BUBBLE_DEFAULT_NUM);
+        mBubbleNum = a.getInt(R.styleable.CleanSwirlAnimationView_bubbleNum, BUBBLE_DEFAULT_NUM);
 
         if (mBubbleNum > BUBBLE_DEFAULT_NUM) {
             mBubbleNum = BUBBLE_DEFAULT_NUM;
         }
 
+        mRate = a.getFloat(R.styleable.CleanSwirlAnimationView_bubbleNum, 1);
+
         a.recycle();
 
         initPaint();
+
+//        mCamera = new Camera();
+//        mMatrix = new Matrix();
+
+
     }
 
     private void initPaint() {
@@ -123,7 +128,7 @@ public class CleanAnimationView extends View {
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
 
-        mCenterW = w / 2;
+        mCenterX = w / 2;
         mCenterY = h / 2;
 
         mOuterCircleRadius = w / 2 * (3.8f / 5);
@@ -157,50 +162,69 @@ public class CleanAnimationView extends View {
         mMinDecrement = (int) (w * 0.5f / 100f);
 
         initBubble();
+
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        long startTime = System.currentTimeMillis();
 
-        canvas.translate(mCenterW, mCenterY);
+        canvas.translate(mCenterX, mCenterY);
 
+//        mMatrix.reset();
+//        mCamera.save();
+////        mCamera.rotateX(mBubbleCanvasDegrees);
+//        mCamera.rotateZ(-mCameraZ);
+//        mCamera.translate(0, 0, mCameraZ);
+//        mCamera.getMatrix(mMatrix);
+//        mCamera.restore();
+////        mMatrix.preTranslate(-mCenterX, -mCenterY);
+////        mMatrix.postTranslate(mCenterX, mCenterY);
+//        canvas.concat(mMatrix);
+
+        //画最外面的圆圈
         mPaint.setColor(mOuterCircleColor);
         canvas.drawCircle(0, 0, mOuterCircleRadius, mPaint);
 
-
+        //画透明度27%的椭圆
         canvas.save();
         canvas.rotate(mOval1Degrees);
         mPaint.setColor(mOval1Color);
         canvas.drawOval(mOval1, mPaint);
         canvas.restore();
 
-
+        //画透明度95%的椭圆
         canvas.save();
         canvas.rotate(mOval2Degrees);
         mPaint.setColor(mOval2Color);
         canvas.drawOval(mOval2, mPaint);
         canvas.restore();
 
+        //画透明度95%的小椭圆
         canvas.save();
         canvas.rotate(mOval3Degrees);
         canvas.drawOval(mOval3, mPaint);
         canvas.restore();
 
+        //画外面的点点
         canvas.save();
         canvas.rotate(mBubbleCanvasDegrees);
         mPaint.setColor(mOval2Color);
         drawBubbles(canvas, mPaint);
-
         canvas.restore();
 
+        //画中间的绿色圆圈
         canvas.save();
         mPaint.setColor(mCenterCircleColor);
         canvas.drawCircle(0, 0, mCenterCircleRadius, mPaint);
         canvas.restore();
 
+
 //        canvas.rotate(mCanvasDegrees);
 
+        long endTime = System.currentTimeMillis();
+        Log.d(TAG, "draw time = " + (endTime - startTime));
     }
 
     private void resetDegrees() {
@@ -216,68 +240,41 @@ public class CleanAnimationView extends View {
             resetDegrees();
         }
         Log.d(TAG, "progress = " + progress);
-        mOval1Degrees = OVAL1_DEFAULT_DEGREES + progress * 1.5f;
-        mOval2Degrees = OVAL2_DEFAULT_DEGREES + progress * 1.3f;
-        mOval3Degrees = OVAL3_DEFAULT_DEGREES + progress * 1.8f;
+        mOval1Degrees = OVAL1_DEFAULT_DEGREES + progress * mRate * 0.5f;
+        mOval2Degrees = OVAL2_DEFAULT_DEGREES + progress * mRate * 0.3f;
+        mOval3Degrees = OVAL3_DEFAULT_DEGREES + progress * mRate * 0.8f;
         mBubbleCanvasDegrees = progress;
         Log.d(TAG, "mOval1Degrees = " + mOval1Degrees);
         Log.d(TAG, "mOval2Degrees = " + mOval2Degrees);
         Log.d(TAG, "mOval3Degrees = " + mOval3Degrees);
 
 
+//        float limitProgress = mMaxProgress * 2 / 3f;
+//
+//        if (progress > limitProgress) {
+//            mCameraZ = progress - limitProgress;
+//        } else {
+//            mCameraZ = 0;
+//        }
+
+
         postInvalidate();
     }
 
-    public void startAnimation(int duration) {
-        mAnimator = ValueAnimator.ofInt(1, 1000);
-        mAnimator.setDuration(duration);
-        mAnimator.setRepeatMode(ValueAnimator.REVERSE);
-        mAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                int value = (int) animation.getAnimatedValue();
-                setProgress(value);
-            }
-        });
 
-
-        mAnimator.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-
-            }
-        });
-
-        mAnimator.start();
-    }
-
-    public ValueAnimator getAnimator() {
-        return mAnimator;
-    }
 
     private void initBubble() {
         if (mBubbles.size() > mBubbleNum) {
             return;
         }
 
+        long startTime = System.currentTimeMillis();
         for (int n = mBubbles.size(); n < mBubbleNum; n++) {
             mBubbles.add(provideBubble());
         }
+        long endTime = System.currentTimeMillis();
+
+        Log.d(TAG, "init bubble time = " + (endTime - startTime));
     }
 
     private CleanBubble provideBubble() {
@@ -343,7 +340,7 @@ public class CleanAnimationView extends View {
         while (n < mBubbles.size()) {
             CleanBubble bubble = mBubbles.get(n);
             canvas.drawCircle(bubble.cx, bubble.cy, bubble.radius, paint);
-            Log.d(TAG, "bubble = " + bubble);
+//            Log.d(TAG, "bubble = " + bubble);
             bubble.decrease();
             if (isBubbleInCenterCircle(bubble)) {
                 mBubbles.remove(bubble);
@@ -351,7 +348,9 @@ public class CleanAnimationView extends View {
                 n++;
             }
         }
+
         initBubble();
+
     }
 
     public void reprovideBubble() {
@@ -365,17 +364,4 @@ public class CleanAnimationView extends View {
 //        double centerDistance = Math.sqrt(Math.pow(Math.abs(bubble.cx), 2) + Math.pow(Math.abs(bubble.cy), 2));
         return (bubble.distance + bubble.radius) < mCenterCircleRadius;
     }
-
-    private class BubbleThread implements Runnable {
-
-        boolean isCancel;
-
-        @Override
-        public void run() {
-            while (!isCancel) {
-
-            }
-        }
-    }
-
 }
