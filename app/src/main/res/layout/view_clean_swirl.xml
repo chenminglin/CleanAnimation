@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:bubbleNum="20"
-        app:rate="0.2"
+        app:rate="0.05"
         app:themeColor="@color/clean_view_theme" />
 
     <RelativeLayout
@@ -51,7 +51,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="3dp"
                 android:text="@string/junk"
-
                 android:textColor="@android:color/white"
                 android:textSize="12sp" />
         </LinearLayout>

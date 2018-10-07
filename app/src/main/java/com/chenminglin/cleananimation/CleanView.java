@@ -12,7 +12,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.LinearInterpolator;
+import android.view.animation.OvershootInterpolator;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 
@@ -21,9 +24,17 @@ public class CleanView extends FrameLayout {
     final String TAG = getClass().getSimpleName();
 
     View mSwirlView;
+    View mTrophyView;
     CleanSwirlAnimationView mCleanSwirlAnimationView;
     TextView mTvSize;
     TextView mTvUnit;
+
+    RelativeLayout mLayoutTrophy;
+    ImageView mStar1;
+    ImageView mStar2;
+    ImageView mStar3;
+    TextView mTvFinish;
+    CleanCircleRippleView mRippleView;
 
     ValueAnimator mAnimator;
     AnimatorSet mScaleAnimatorSet;
@@ -71,9 +82,24 @@ public class CleanView extends FrameLayout {
         mSwirlView = LayoutInflater.from(getContext()).inflate(R.layout.view_clean_swirl, null);
         addView(mSwirlView);
 
+        mTrophyView = LayoutInflater.from(getContext()).inflate(R.layout.view_trophy, null);
+        addView(mTrophyView);
+
         mCleanSwirlAnimationView = findViewById(R.id.swirl_animation_view);
         mTvSize = findViewById(R.id.txt_size);
         mTvUnit = findViewById(R.id.txt_unit);
+
+
+        mLayoutTrophy = findViewById(R.id.layout_trophy);
+
+        mStar1 = findViewById(R.id.star1);
+        mStar2 = findViewById(R.id.star2);
+        mStar3 = findViewById(R.id.star3);
+        mTvFinish = findViewById(R.id.tv_clean_finish);
+
+        mRippleView = findViewById(R.id.rippleView);
+
+
     }
 
 
@@ -99,12 +125,13 @@ public class CleanView extends FrameLayout {
                         mScaleAnimatorSet = new AnimatorSet();
                         ObjectAnimator scaleXAnimator = ObjectAnimator.ofFloat(mSwirlView, "scaleX", 1, 0.3f);
                         ObjectAnimator scaleYAnimator = ObjectAnimator.ofFloat(mSwirlView, "scaleY", 1, 0.3f);
+                        ObjectAnimator alphaAnimator = ObjectAnimator.ofFloat(mSwirlView, "alpha", 1, 0f);
 
                         long currentTime = System.currentTimeMillis();
                         long timeLeft = duration - (currentTime - mAmimationStartTime);
                         mScaleAnimatorSet.setDuration(timeLeft);
                         if (timeLeft > 0) {
-                            mScaleAnimatorSet.play(scaleXAnimator).with(scaleYAnimator);
+                            mScaleAnimatorSet.play(scaleXAnimator).with(scaleYAnimator).with(alphaAnimator);
                             mScaleAnimatorSet.setInterpolator(new LinearInterpolator());
                             mScaleAnimatorSet.start();
                         }
@@ -124,6 +151,7 @@ public class CleanView extends FrameLayout {
 
             @Override
             public void onAnimationEnd(Animator animation) {
+                startTrophyAnimation();
             }
 
             @Override
@@ -135,11 +163,11 @@ public class CleanView extends FrameLayout {
 
             }
         });
-
         mAnimator.setInterpolator(new AccelerateInterpolator());
         mAnimator.start();
 
 
+        //缩小
         ValueAnimator sizeAnimator = ValueAnimator.ofFloat(mJunkSize, 0);
         long duration2 = duration / 10 * 9;
         sizeAnimator.setDuration(duration2);
@@ -158,6 +186,61 @@ public class CleanView extends FrameLayout {
 
         sizeAnimator.setInterpolator(new LinearInterpolator());
         sizeAnimator.start();
+
+
+    }
+
+    private void startTrophyAnimation(){
+        mTrophyView.setVisibility(VISIBLE);
+        AnimatorSet animatorSet2 = new AnimatorSet();
+        ObjectAnimator scaleXAnimator = ObjectAnimator.ofFloat(mTrophyView, "scaleX", 0.3f, 1f);
+        ObjectAnimator scaleYAnimator = ObjectAnimator.ofFloat(mTrophyView, "scaleY", 0.3f, 1f);
+        ObjectAnimator alphaAnimator = ObjectAnimator.ofFloat(mTrophyView, "alpha", 0f, 1f);
+
+        animatorSet2.setDuration(300);
+        animatorSet2.play(scaleXAnimator).with(scaleYAnimator).with(alphaAnimator);
+        animatorSet2.setInterpolator(new OvershootInterpolator());
+        animatorSet2.start();
+
+        animatorSet2.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mStar1.setVisibility(VISIBLE);
+                mStar2.setVisibility(VISIBLE);
+                mStar3.setVisibility(VISIBLE);
+                mTvFinish.setVisibility(VISIBLE);
+
+                provideStarAnimator(mStar1,1000).start();
+                provideStarAnimator(mStar2,800).start();
+                provideStarAnimator(mStar3,500).start();
+
+                mRippleView.startAnimation();
+
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+    }
+
+    private ObjectAnimator provideStarAnimator(View view,long duration){
+        ObjectAnimator alphaAnimator = ObjectAnimator.ofFloat(view, "alpha", 0f, 1f);
+        alphaAnimator.setDuration(duration);
+        alphaAnimator.setRepeatMode(ValueAnimator.RESTART);
+        alphaAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        return alphaAnimator;
     }
 
 

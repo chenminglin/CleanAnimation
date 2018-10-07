@@ -46,7 +46,7 @@ public class SimpleActivity extends AppCompatActivity {
 //                cleanSwirlAnimationView.setProgress(1);
                 try {
                     cleanView.setJunkSize(10000000 * 1000);
-                    cleanView.startAnimation(5000, 2000);
+                    cleanView.startAnimation(5000, 500);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
