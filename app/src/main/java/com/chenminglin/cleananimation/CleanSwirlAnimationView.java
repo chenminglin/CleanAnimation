@@ -16,26 +16,36 @@ import java.util.Random;
 
 
 public class CleanSwirlAnimationView extends View {
-
     final String TAG = getClass().getSimpleName();
 
     final int DEFAULT_COLOR = Color.parseColor("#32BD7B");
+    //椭圆的默认角度
     final float OVAL1_DEFAULT_DEGREES = -15F;
     final float OVAL2_DEFAULT_DEGREES = -60F;
     final float OVAL3_DEFAULT_DEGREES = -135F;
+    //椭圆的转动速率
     float mRate = 1;
 
+    //水泡的默认个数
     final int BUBBLE_DEFAULT_NUM = 50;
 
+    //水泡的最大半径
     float mBubbleMaxRadius = 0;
+    //水泡的最小半径
     float mBubbleMinRadius = 0;
+    //水泡离中心点的最小x坐标
     float mBubbleMinX = 0;
+    //水泡离中心点的最大x坐标
     float mBubbleMaxX = 0;
+    //水泡离中心点的最小Y坐标
     float mBubbleMinY = 0;
+    //水泡离中心点的最大Y坐标
     float mBubbleMaxY = 0;
-
+    //水泡中心最小距离
     float mBubbleMinCenterDistance;
+    //水泡中心最大距离
     float mBubbleMaxCenterDistance;
+    //水泡的个数
     int mBubbleNum;
 
     List<CleanBubble> mBubbles = new ArrayList<>();
@@ -59,14 +69,16 @@ public class CleanSwirlAnimationView extends View {
     RectF mOval3 = new RectF();
     float mOval3Degrees = OVAL3_DEFAULT_DEGREES;
 
+    //中心圈的半径
     float mCenterCircleRadius;
+    //中心圈的颜色
     int mCenterCircleColor;
-
+    //画水泡的画布的角度
     float mBubbleCanvasDegrees;
-
+    //水泡收缩递减最大值
     int mMaxDecrement;
+    //水泡收缩递减最小值
     int mMinDecrement;
-
 
 
 //    Camera mCamera;
@@ -114,8 +126,6 @@ public class CleanSwirlAnimationView extends View {
 
 //        mCamera = new Camera();
 //        mMatrix = new Matrix();
-
-
     }
 
     private void initPaint() {
@@ -162,7 +172,6 @@ public class CleanSwirlAnimationView extends View {
         mMinDecrement = (int) (w * 0.5f / 100f);
 
         initBubble();
-
     }
 
     @Override
@@ -262,7 +271,6 @@ public class CleanSwirlAnimationView extends View {
     }
 
 
-
     private void initBubble() {
         if (mBubbles.size() > mBubbleNum) {
             return;
@@ -287,10 +295,6 @@ public class CleanSwirlAnimationView extends View {
     }
 
     Random random = new Random(System.currentTimeMillis());
-//    private float randomBubbleCenter() {
-//        int coordinate = random.nextInt((int) mBubbleMaxX * 2);
-//        return coordinate + mBubbleMinX;
-//    }
 
     private float randomBubbleCenterX() {
         int coordinate = random.nextInt((int) mBubbleMaxX * 2);
@@ -348,9 +352,7 @@ public class CleanSwirlAnimationView extends View {
                 n++;
             }
         }
-
         initBubble();
-
     }
 
     public void reprovideBubble() {
@@ -364,4 +366,14 @@ public class CleanSwirlAnimationView extends View {
 //        double centerDistance = Math.sqrt(Math.pow(Math.abs(bubble.cx), 2) + Math.pow(Math.abs(bubble.cy), 2));
         return (bubble.distance + bubble.radius) < mCenterCircleRadius;
     }
+
+    public void setRate(float rate){
+        this.mRate = rate;
+    }
+
+    public void setBubbleNum(int bubbleNum){
+        this.mBubbleNum = bubbleNum;
+    }
+
+
 }

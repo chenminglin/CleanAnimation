@@ -1,46 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context=".SimpleActivity">
-
-
 
     <com.chenminglin.cleananimation.CleanView
         android:id="@+id/clean_view"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:background="@color/clean_view_theme"/>
+        android:layout_height="match_parent"
+        android:background="@color/clean_view_theme" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <SeekBar
-            android:id="@+id/seekbar"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:max="1000"
-            android:progress="1" />
-
-        <Button
-            android:id="@+id/btn_start"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="start" />
-
-        <Button
-            android:id="@+id/btn_provide_bubble"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="bubble" />
-    </LinearLayout>
-
-
-</LinearLayout>
+</FrameLayout>

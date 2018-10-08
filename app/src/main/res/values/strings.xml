@@ -2,4 +2,12 @@
     <string name="app_name">CleanAnimation</string>
 
     <string name="junk">垃圾</string>
+
+
+    <string name="main_duration">动画所用时间 %d s</string>
+    <string name="main_rate">转动速率指数 %.2f (越大越快)</string>
+    <string name="main_bubble_num">点点个数 %d</string>
+    <string name="main_draw_frequency">旋转动画绘制次数 %d （次数越多，单位时间帧数越多，性能越低）</string>
+    <string name="main_size">缓存垃圾大小 %d</string>
+
 </resources>

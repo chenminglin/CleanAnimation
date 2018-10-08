@@ -58,12 +58,10 @@ public class CleanCircleRippleView extends View {
         final TypedArray a = getContext().obtainStyledAttributes(
                 attrs, R.styleable.CleanCircleRippleView, defStyle, 0);
 
-
         a.recycle();
 
         // Set up a default TextPaint object
         initPaint();
-
     }
 
     private void initPaint() {
@@ -105,17 +103,16 @@ public class CleanCircleRippleView extends View {
     }
 
     private void drawRipple(Canvas canvas) {
-        for (int n=3;n<ripples.size();n++) {
+        for (int n = 3; n < ripples.size(); n++) {
             CircleRipple ripple = ripples.get(n);
             float alpha = ripple.radius / mRippleMaxRadius;
-            int alphaInt = (int) (255  * 0.3f * (1-alpha));
-            Log.d(TAG, "ripple.radius = "+ ripple.radius +"alphaInt = " + alphaInt);
-            if(alphaInt<0){
+            int alphaInt = (int) (255 * 0.3f * (1 - alpha));
+//            Log.d(TAG, "ripple.radius = " + ripple.radius + "alphaInt = " + alphaInt);
+            if (alphaInt < 0) {
                 mPaint.setAlpha(0);
-            }else{
+            } else {
                 mPaint.setAlpha(alphaInt);
             }
-
             canvas.drawCircle(0, 0, ripple.radius, mPaint);
         }
     }
@@ -134,13 +131,8 @@ public class CleanCircleRippleView extends View {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 int value = (int) animation.getAnimatedValue();
-                Log.d(TAG, "value =  " + value);
+//                Log.d(TAG, "value =  " + value);
                 setProgress(value);
-                if (value == 100) {
-                    for (CircleRipple ripple : ripples) {
-                        Log.d(TAG, "ripple.radius = " + ripple.radius);
-                    }
-                }
             }
         });
         animator.setDuration((long) duration);
@@ -155,6 +147,4 @@ public class CleanCircleRippleView extends View {
         public int radius;
         public int initRadius;
     }
-
-
 }

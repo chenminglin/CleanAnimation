@@ -38,9 +38,14 @@ public class CleanView extends FrameLayout {
 
     ValueAnimator mAnimator;
     AnimatorSet mScaleAnimatorSet;
+    ValueAnimator mSizeAnimator;
+
 
     int mMaxProgress;
 
+    /**
+     * 缩放动画界限，用于控制缩放动画占动画总时长
+     */
     int mScaleProgressLimit;
 
     long mAmimationStartTime;
@@ -72,13 +77,6 @@ public class CleanView extends FrameLayout {
 
         a.recycle();
 
-
-//        ViewStub viewStub = new ViewStub(getContext());
-//        viewStub.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-//        viewStub.setInflatedId();
-//        viewStub.
-//        addView(viewStub);
-
         mSwirlView = LayoutInflater.from(getContext()).inflate(R.layout.view_clean_swirl, null);
         addView(mSwirlView);
 
@@ -98,13 +96,10 @@ public class CleanView extends FrameLayout {
         mTvFinish = findViewById(R.id.tv_clean_finish);
 
         mRippleView = findViewById(R.id.rippleView);
-
-
     }
 
 
     public void startAnimation(final long duration, int maxProgress) throws Exception {
-
         if (mJunkSize <= 0) {
             throw new Exception("垃圾空间大小没有设置");
         }
@@ -137,8 +132,6 @@ public class CleanView extends FrameLayout {
                         }
                     }
                 }
-
-
             }
         });
 
@@ -166,14 +159,20 @@ public class CleanView extends FrameLayout {
         mAnimator.setInterpolator(new AccelerateInterpolator());
         mAnimator.start();
 
-
-        //缩小
-        ValueAnimator sizeAnimator = ValueAnimator.ofFloat(mJunkSize, 0);
         long duration2 = duration / 10 * 9;
-        sizeAnimator.setDuration(duration2);
-        sizeAnimator.setRepeatMode(ValueAnimator.REVERSE);
+        startSizeAnimation(duration2);
+    }
 
-        sizeAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+    /**
+     * 垃圾容量大小动画
+     *
+     * @param duration
+     */
+    private void startSizeAnimation(long duration) {
+        mSizeAnimator = ValueAnimator.ofFloat(mJunkSize, 0);
+        mSizeAnimator.setDuration(duration);
+        mSizeAnimator.setRepeatMode(ValueAnimator.REVERSE);
+        mSizeAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 float size = (float) animation.getAnimatedValue();
@@ -183,29 +182,28 @@ public class CleanView extends FrameLayout {
                 mTvUnit.setText(sizeAndUnit[1]);
             }
         });
-
-        sizeAnimator.setInterpolator(new LinearInterpolator());
-        sizeAnimator.start();
-
-
+        mSizeAnimator.setInterpolator(new LinearInterpolator());
+        mSizeAnimator.start();
     }
 
-    private void startTrophyAnimation(){
+    /**
+     * 奖杯动画
+     */
+    private void startTrophyAnimation() {
         mTrophyView.setVisibility(VISIBLE);
-        AnimatorSet animatorSet2 = new AnimatorSet();
+        AnimatorSet trophyAnimator = new AnimatorSet();
         ObjectAnimator scaleXAnimator = ObjectAnimator.ofFloat(mTrophyView, "scaleX", 0.3f, 1f);
         ObjectAnimator scaleYAnimator = ObjectAnimator.ofFloat(mTrophyView, "scaleY", 0.3f, 1f);
         ObjectAnimator alphaAnimator = ObjectAnimator.ofFloat(mTrophyView, "alpha", 0f, 1f);
 
-        animatorSet2.setDuration(300);
-        animatorSet2.play(scaleXAnimator).with(scaleYAnimator).with(alphaAnimator);
-        animatorSet2.setInterpolator(new OvershootInterpolator());
-        animatorSet2.start();
+        trophyAnimator.setDuration(300);
+        trophyAnimator.play(scaleXAnimator).with(scaleYAnimator).with(alphaAnimator);
+        trophyAnimator.setInterpolator(new OvershootInterpolator());
+        trophyAnimator.start();
 
-        animatorSet2.addListener(new Animator.AnimatorListener() {
+        trophyAnimator.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
-
             }
 
             @Override
@@ -215,27 +213,31 @@ public class CleanView extends FrameLayout {
                 mStar3.setVisibility(VISIBLE);
                 mTvFinish.setVisibility(VISIBLE);
 
-                provideStarAnimator(mStar1,1000).start();
-                provideStarAnimator(mStar2,800).start();
-                provideStarAnimator(mStar3,500).start();
+                provideStarAnimator(mStar1, 1000).start();
+                provideStarAnimator(mStar2, 800).start();
+                provideStarAnimator(mStar3, 500).start();
 
                 mRippleView.startAnimation();
-
             }
 
             @Override
             public void onAnimationCancel(Animator animation) {
-
             }
 
             @Override
             public void onAnimationRepeat(Animator animation) {
-
             }
         });
     }
 
-    private ObjectAnimator provideStarAnimator(View view,long duration){
+    /**
+     * 星星动画
+     *
+     * @param view
+     * @param duration
+     * @return
+     */
+    private ObjectAnimator provideStarAnimator(View view, long duration) {
         ObjectAnimator alphaAnimator = ObjectAnimator.ofFloat(view, "alpha", 0f, 1f);
         alphaAnimator.setDuration(duration);
         alphaAnimator.setRepeatMode(ValueAnimator.RESTART);
@@ -268,10 +270,22 @@ public class CleanView extends FrameLayout {
         if (mAnimator != null) {
             mAnimator.cancel();
         }
+
+        if (mSizeAnimator != null) {
+            mSizeAnimator.cancel();
+        }
     }
 
     public ValueAnimator getAnimator() {
         return mAnimator;
+    }
+
+    public void setRate(float rate) {
+        this.mCleanSwirlAnimationView.setRate(rate);
+    }
+
+    public void setBubbleNum(int bubbleNum) {
+        this.mCleanSwirlAnimationView.setBubbleNum(bubbleNum);
     }
 
 }

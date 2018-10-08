@@ -1,18 +1,139 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/clean_view_theme"
+    android:orientation="vertical"
+    android:padding="16dp"
     tools:context=".MainActivity">
 
     <TextView
+        android:id="@+id/tv_duration"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:textColor="@android:color/white" />
 
-</android.support.constraint.ConstraintLayout>
+    <SeekBar
+        android:id="@+id/sb_duration"
+        style="@style/Widget.AppCompat.SeekBar.Discrete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="10"
+        android:progress="3"
+        android:layout_marginTop="4dp"/>
+
+
+    <TextView
+        android:id="@+id/tv_rate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="10dp"/>
+
+    <SeekBar
+        android:id="@+id/sb_rate"
+        style="@style/Widget.AppCompat.SeekBar.Discrete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="10"
+        android:progress="3"
+        android:layout_marginTop="4dp"/>
+
+    <TextView
+        android:id="@+id/tv_bubble_num"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="10dp"/>
+
+    <SeekBar
+        android:id="@+id/sb_bubble_num"
+        style="@style/Widget.AppCompat.SeekBar.Discrete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="50"
+        android:progress="30"
+        android:layout_marginTop="4dp"/>
+
+    <TextView
+        android:id="@+id/tv_draw_frequency"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/white"
+        android:text=""
+        android:layout_marginTop="10dp"/>
+
+    <SeekBar
+        android:id="@+id/sb_draw_frequency"
+        style="@style/Widget.AppCompat.SeekBar.Discrete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="5"
+        android:progress="1"
+        android:layout_marginTop="4dp"/>
+
+    <TextView
+        android:id="@+id/tv_size"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="10dp"
+        />
+
+    <SeekBar
+        android:id="@+id/sb_size"
+        style="@style/Widget.AppCompat.SeekBar.Discrete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="100"
+        android:progress="40"
+        android:layout_marginTop="4dp"/>
+
+    <TextView
+        android:id="@+id/tv_size_unit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/white"
+        android:text="单位："
+        />
+    <RadioGroup
+        android:id="@+id/rg_size_unit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:checkedButton="@id/rb_size_unit_GB"
+        android:orientation="horizontal"
+        >
+        <RadioButton
+            android:id="@+id/rb_size_unit_KB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="KB"/>
+
+        <RadioButton
+            android:id="@+id/rb_size_unit_MB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="MB"/>
+        <RadioButton
+            android:id="@+id/rb_size_unit_GB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="GB"/>
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/btn_start"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="开始滚筒洗衣机" />
+
+    <Button
+        android:id="@+id/btn_decomposition"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="滚筒洗衣机分解动画" />
+</LinearLayout>
