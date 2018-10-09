@@ -22,7 +22,7 @@ public class CleanSwirlAnimationView extends View {
     //椭圆的默认角度
     final float OVAL1_DEFAULT_DEGREES = -15F;
     final float OVAL2_DEFAULT_DEGREES = -60F;
-    final float OVAL3_DEFAULT_DEGREES = -135F;
+    final float OVAL3_DEFAULT_DEGREES = -100F;
     //椭圆的转动速率
     float mRate = 1;
 
@@ -55,19 +55,21 @@ public class CleanSwirlAnimationView extends View {
     int mCenterX;
     int mCenterY;
 
-    int mOuterCircleColor = Color.parseColor("#30FFFFFF");
-    float mOuterCircleRadius;
+    int mOuterCircleColor = Color.parseColor("#20FFFFFF");
+
 
     int mOval1Color = Color.parseColor("#43FFFFFF");
     RectF mOval1 = new RectF();
     float mOval1Degrees = OVAL1_DEFAULT_DEGREES;
 
-    int mOval2Color = Color.parseColor("#F2FFFFFF");
+    int mOval2Color = Color.parseColor("#50FFFFFF");
     RectF mOval2 = new RectF();
     float mOval2Degrees = OVAL2_DEFAULT_DEGREES;
 
     RectF mOval3 = new RectF();
     float mOval3Degrees = OVAL3_DEFAULT_DEGREES;
+
+    int mBubbleColor = Color.parseColor("#7FFFFFFF");
 
     //中心圈的半径
     float mCenterCircleRadius;
@@ -79,6 +81,8 @@ public class CleanSwirlAnimationView extends View {
     int mMaxDecrement;
     //水泡收缩递减最小值
     int mMinDecrement;
+
+    float mOuterCircleRadius;
 
 
 //    Camera mCamera;
@@ -118,10 +122,9 @@ public class CleanSwirlAnimationView extends View {
             mBubbleNum = BUBBLE_DEFAULT_NUM;
         }
 
-        mRate = a.getFloat(R.styleable.CleanSwirlAnimationView_bubbleNum, 1);
+        mRate = a.getFloat(R.styleable.CleanSwirlAnimationView_rate, 1);
 
         a.recycle();
-
         initPaint();
 
 //        mCamera = new Camera();
@@ -141,23 +144,23 @@ public class CleanSwirlAnimationView extends View {
         mCenterX = w / 2;
         mCenterY = h / 2;
 
-        mOuterCircleRadius = w / 2 * (3.8f / 5);
+        mOuterCircleRadius = w / 2 * (3.4f / 5);
 
-        float oval1Left = w / 2 * (3f / 5);
-        float oval1Top = w / 2 * (2.5f / 5);
+        float oval1Left = w / 2 * (2.9f / 5);
+        float oval1Top = w / 2 * (2.45f / 5);
         mOval1.set(-oval1Left, -oval1Top, oval1Left, oval1Top);
 
         float oval2Left = w / 2 * (2.8f / 5);
-        float oval2Top = w / 2 * (2.5f / 5);
+        float oval2Top = w / 2 * (2.45f / 5);
         mOval2.set(-oval2Left, -oval2Top, oval2Left, oval2Top);
 
-        float oval3Left = w / 2 * (2.6f / 5);
-        float oval3Top = w / 2 * (2.5f / 5);
+        float oval3Left = w / 2 * (2.75f / 5);
+        float oval3Top = w / 2 * (2.45f / 5);
         mOval3.set(-oval3Left, -oval3Top, oval3Left, oval3Top);
 
         mCenterCircleRadius = w / 2 * (2.4f / 5);
 
-        mBubbleMaxRadius = w * 1.1f / 100f;
+        mBubbleMaxRadius = w * 0.8f / 100f;
         mBubbleMinRadius = w * 0.4f / 100f;
         mBubbleMinX = -(w / 2 * (4.5f / 5));
         mBubbleMaxX = w / 2 * (4.5f / 5);
@@ -193,8 +196,8 @@ public class CleanSwirlAnimationView extends View {
 //        canvas.concat(mMatrix);
 
         //画最外面的圆圈
-        mPaint.setColor(mOuterCircleColor);
-        canvas.drawCircle(0, 0, mOuterCircleRadius, mPaint);
+//        mPaint.setColor(mOuterCircleColor);
+//        canvas.drawCircle(0, 0, mOuterCircleRadius, mPaint);
 
         //画透明度27%的椭圆
         canvas.save();
@@ -219,7 +222,7 @@ public class CleanSwirlAnimationView extends View {
         //画外面的点点
         canvas.save();
         canvas.rotate(mBubbleCanvasDegrees);
-        mPaint.setColor(mOval2Color);
+        mPaint.setColor(mBubbleColor);
         drawBubbles(canvas, mPaint);
         canvas.restore();
 
@@ -251,21 +254,11 @@ public class CleanSwirlAnimationView extends View {
         Log.d(TAG, "progress = " + progress);
         mOval1Degrees = OVAL1_DEFAULT_DEGREES + progress * mRate * 0.5f;
         mOval2Degrees = OVAL2_DEFAULT_DEGREES + progress * mRate * 0.3f;
-        mOval3Degrees = OVAL3_DEFAULT_DEGREES + progress * mRate * 0.8f;
-        mBubbleCanvasDegrees = progress;
+        mOval3Degrees = OVAL3_DEFAULT_DEGREES + progress * mRate * 0.7f;
+        mBubbleCanvasDegrees = progress * mRate * 0.3f;
         Log.d(TAG, "mOval1Degrees = " + mOval1Degrees);
         Log.d(TAG, "mOval2Degrees = " + mOval2Degrees);
         Log.d(TAG, "mOval3Degrees = " + mOval3Degrees);
-
-
-//        float limitProgress = mMaxProgress * 2 / 3f;
-//
-//        if (progress > limitProgress) {
-//            mCameraZ = progress - limitProgress;
-//        } else {
-//            mCameraZ = 0;
-//        }
-
 
         postInvalidate();
     }
@@ -340,6 +333,7 @@ public class CleanSwirlAnimationView extends View {
     }
 
     private void drawBubbles(Canvas canvas, Paint paint) {
+        mPaint.setColor(Color.WHITE);
         int n = 0;
         while (n < mBubbles.size()) {
             CleanBubble bubble = mBubbles.get(n);

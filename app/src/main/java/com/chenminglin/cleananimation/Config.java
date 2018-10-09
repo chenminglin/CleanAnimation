@@ -5,10 +5,11 @@ import android.os.Parcelable;
 
 public class Config implements Parcelable {
     long duration;
-    float rate;
+    int rate;
     int bubbleNum;
     int drawFrequency;
     long junkSize;
+
 
     @Override
     public int describeContents() {
@@ -18,7 +19,7 @@ public class Config implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(this.duration);
-        dest.writeFloat(this.rate);
+        dest.writeInt(this.rate);
         dest.writeInt(this.bubbleNum);
         dest.writeInt(this.drawFrequency);
         dest.writeLong(this.junkSize);
@@ -29,7 +30,7 @@ public class Config implements Parcelable {
 
     protected Config(Parcel in) {
         this.duration = in.readLong();
-        this.rate = in.readFloat();
+        this.rate = in.readInt();
         this.bubbleNum = in.readInt();
         this.drawFrequency = in.readInt();
         this.junkSize = in.readLong();

@@ -22,7 +22,9 @@
             android:name=".SimpleActivity"
             android:hardwareAccelerated="false"
             android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity android:name=".CleanSwirlActivity"></activity>
+        <activity
+            android:name=".CleanSwirlActivity"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

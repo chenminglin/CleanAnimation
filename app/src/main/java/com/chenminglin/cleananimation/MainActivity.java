@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         sbRate.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                float rate = progress * 0.01f;
+                int rate = progress ;
                 tvRate.setText(getResources().getString(R.string.main_rate, rate));
             }
 
@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-        float rate = sbDuration.getProgress() * 0.01f;
+        int rate = sbDuration.getProgress() ;
         tvRate.setText(getResources().getString(R.string.main_rate, rate));
 
         final TextView tvBubbleNum = findViewById(R.id.tv_bubble_num);
@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
                 config.bubbleNum = sbBubbleNum.getProgress();
                 config.drawFrequency = sbDrawFrequency.getProgress() * 500;
                 config.duration = sbDuration.getProgress() * 1000;
-                config.rate = sbRate.getProgress() * 0.01f;
+                config.rate = sbRate.getProgress();
                 int sizeProgress = sbSize.getProgress();
                 int checkedId = rgButton.getCheckedRadioButtonId();
                 long size = 0;
@@ -149,9 +149,36 @@ public class MainActivity extends AppCompatActivity {
                 }
                 config.junkSize = size;
                 intent.putExtra(Constants.KEY_PARAMS1, config);
+                startActivity(intent);
+            }
+        });
 
+
+        findViewById(R.id.btn_decomposition).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, CleanSwirlActivity.class);
+                Config config = new Config();
+                config.bubbleNum = sbBubbleNum.getProgress();
+                config.drawFrequency = sbDrawFrequency.getProgress() * 500;
+                config.duration = sbDuration.getProgress() * 1000;
+                config.rate = sbRate.getProgress();
+                int sizeProgress = sbSize.getProgress();
+                int checkedId = rgButton.getCheckedRadioButtonId();
+                long size = 0;
+                if (checkedId == R.id.rb_size_unit_KB) {
+                    size = sizeProgress * 1024;
+                } else if (checkedId == R.id.rb_size_unit_MB) {
+                    size = ((long) sizeProgress) * 1024 * 1024;
+                } else if (checkedId == R.id.rb_size_unit_GB) {
+                    size = ((long) sizeProgress) * 1024 * 1024 * 1024;
+                }
+                config.junkSize = size;
+                intent.putExtra(Constants.KEY_PARAMS1, config);
                 startActivity(intent);
             }
         });
     }
+
+
 }

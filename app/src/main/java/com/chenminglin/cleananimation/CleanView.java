@@ -24,6 +24,7 @@ public class CleanView extends FrameLayout {
     final String TAG = getClass().getSimpleName();
 
     View mSwirlView;
+    View mSwirlOuterCircleView;
     View mTrophyView;
     CleanSwirlAnimationView mCleanSwirlAnimationView;
     TextView mTvSize;
@@ -40,6 +41,7 @@ public class CleanView extends FrameLayout {
     AnimatorSet mScaleAnimatorSet;
     ValueAnimator mSizeAnimator;
 
+    AnimatorSet mOuterCircleAnimatorSet;
 
     int mMaxProgress;
 
@@ -84,6 +86,7 @@ public class CleanView extends FrameLayout {
         addView(mTrophyView);
 
         mCleanSwirlAnimationView = findViewById(R.id.swirl_animation_view);
+        mSwirlOuterCircleView = findViewById(R.id.swirl_outer_ripple_view);
         mTvSize = findViewById(R.id.txt_size);
         mTvUnit = findViewById(R.id.txt_unit);
 
@@ -109,6 +112,7 @@ public class CleanView extends FrameLayout {
         mAnimator = ValueAnimator.ofInt(1, maxProgress);
         mAnimator.setDuration(duration);
         mAnimator.setRepeatMode(ValueAnimator.REVERSE);
+        mAnimator.setInterpolator(new AccelerateInterpolator());
         mAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -124,8 +128,9 @@ public class CleanView extends FrameLayout {
 
                         long currentTime = System.currentTimeMillis();
                         long timeLeft = duration - (currentTime - mAmimationStartTime);
-                        mScaleAnimatorSet.setDuration(timeLeft);
+
                         if (timeLeft > 0) {
+                            mScaleAnimatorSet.setDuration(timeLeft);
                             mScaleAnimatorSet.play(scaleXAnimator).with(scaleYAnimator).with(alphaAnimator);
                             mScaleAnimatorSet.setInterpolator(new LinearInterpolator());
                             mScaleAnimatorSet.start();
@@ -145,6 +150,10 @@ public class CleanView extends FrameLayout {
             @Override
             public void onAnimationEnd(Animator animation) {
                 startTrophyAnimation();
+                mOuterCircleAnimatorSet.cancel();
+                mOuterCircleAnimatorSet = null;
+                removeView(mSwirlView);
+                mSwirlView = null;
             }
 
             @Override
@@ -156,11 +165,11 @@ public class CleanView extends FrameLayout {
 
             }
         });
-        mAnimator.setInterpolator(new AccelerateInterpolator());
         mAnimator.start();
 
         long duration2 = duration / 10 * 9;
         startSizeAnimation(duration2);
+        startOuterCircleAnimation();
     }
 
     /**
@@ -184,6 +193,24 @@ public class CleanView extends FrameLayout {
         });
         mSizeAnimator.setInterpolator(new LinearInterpolator());
         mSizeAnimator.start();
+
+    }
+
+    private void startOuterCircleAnimation(){
+        mOuterCircleAnimatorSet = new AnimatorSet();
+        ObjectAnimator scaleXAnimator = ObjectAnimator.ofFloat(mSwirlOuterCircleView, "scaleX", 1, 1.3f);
+        scaleXAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        scaleXAnimator.setRepeatMode(ValueAnimator.RESTART);
+        ObjectAnimator scaleYAnimator = ObjectAnimator.ofFloat(mSwirlOuterCircleView, "scaleY", 1, 1.3f);
+        scaleYAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        scaleYAnimator.setRepeatMode(ValueAnimator.RESTART);
+        ObjectAnimator alphaAnimator = ObjectAnimator.ofFloat(mSwirlOuterCircleView, "alpha", 1, 0f);
+        alphaAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        alphaAnimator.setRepeatMode(ValueAnimator.RESTART);
+        mOuterCircleAnimatorSet.setDuration(600);
+        mOuterCircleAnimatorSet.play(scaleXAnimator).with(scaleYAnimator).with(alphaAnimator);
+        mOuterCircleAnimatorSet.setInterpolator(new LinearInterpolator());
+        mOuterCircleAnimatorSet.start();
     }
 
     /**
@@ -215,7 +242,7 @@ public class CleanView extends FrameLayout {
 
                 provideStarAnimator(mStar1, 1000).start();
                 provideStarAnimator(mStar2, 800).start();
-                provideStarAnimator(mStar3, 500).start();
+                provideStarAnimator(mStar3, 700).start();
 
                 mRippleView.startAnimation();
             }
@@ -273,6 +300,10 @@ public class CleanView extends FrameLayout {
 
         if (mSizeAnimator != null) {
             mSizeAnimator.cancel();
+        }
+
+        if(mOuterCircleAnimatorSet !=null){
+            mOuterCircleAnimatorSet.cancel();
         }
     }
 

@@ -8,12 +8,19 @@
     tools:background="@color/clean_view_theme"
     tools:context=".SimpleActivity">
 
+    <com.chenminglin.cleananimation.CleanSwirlOuterRippleView
+        android:id="@+id/swirl_outer_ripple_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"/>
+
+
     <com.chenminglin.cleananimation.CleanSwirlAnimationView
         android:id="@+id/swirl_animation_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:bubbleNum="40"
-        app:rate="0.05"
+        app:rate="2"
         app:themeColor="@color/clean_view_theme" />
 
     <RelativeLayout
