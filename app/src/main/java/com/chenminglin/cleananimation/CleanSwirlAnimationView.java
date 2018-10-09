@@ -269,7 +269,7 @@ public class CleanSwirlAnimationView extends View {
     }
 
     private void progressToRate(int progress) {
-        mRealRate = (mRate * progress * progress ) / 50000f;
+        mRealRate = (mRate * progress * progress ) / 60000f;
     }
 
 

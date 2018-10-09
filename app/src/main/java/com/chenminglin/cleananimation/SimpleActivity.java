@@ -34,6 +34,13 @@ public class SimpleActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+
+        cleanView.setOnCleanAnimationListener(new CleanView.OnCleanAnimationListener() {
+            @Override
+            public void onFinish() {
+                finish();
+            }
+        });
     }
 
     @Override

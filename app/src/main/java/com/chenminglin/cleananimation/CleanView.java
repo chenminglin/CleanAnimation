@@ -58,6 +58,8 @@ public class CleanView extends FrameLayout {
 
     long mJunkSize;
 
+    OnCleanAnimationListener mOnCleanAnimationListener;
+
 
     public CleanView(Context context) {
         super(context);
@@ -268,6 +270,14 @@ public class CleanView extends FrameLayout {
             public void onAnimationRepeat(Animator animation) {
             }
         });
+        mTrophyView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(mOnCleanAnimationListener != null){
+                    mOnCleanAnimationListener.onFinish();
+                }
+            }
+        },1200);
     }
 
     /**
@@ -330,6 +340,14 @@ public class CleanView extends FrameLayout {
 
     public void setBubbleNum(int bubbleNum) {
         this.mCleanSwirlAnimationView.setBubbleNum(bubbleNum);
+    }
+
+    public void setOnCleanAnimationListener(OnCleanAnimationListener listener){
+        this.mOnCleanAnimationListener = listener;
+    }
+
+    interface OnCleanAnimationListener{
+        void onFinish();
     }
 
 }
