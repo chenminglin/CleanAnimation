@@ -49,6 +49,10 @@ public class CleanView extends FrameLayout {
      * 缩放动画界限，用于控制缩放动画占动画总时长
      */
     int mScaleProgressLimit;
+    /**
+     * 不再生成水泡界限
+     */
+    int mNoProvideBubbleLimit;
 
     long mAmimationStartTime;
 
@@ -108,16 +112,22 @@ public class CleanView extends FrameLayout {
         }
 
         mMaxProgress = maxProgress;
+        mCleanSwirlAnimationView.setMaxProgress(maxProgress);
         mScaleProgressLimit = (int) (maxProgress / 10f * 9);
+        mNoProvideBubbleLimit = (int) (maxProgress / 10f * 4);
         mAnimator = ValueAnimator.ofInt(1, maxProgress);
         mAnimator.setDuration(duration);
         mAnimator.setRepeatMode(ValueAnimator.REVERSE);
-        mAnimator.setInterpolator(new AccelerateInterpolator());
+        mAnimator.setInterpolator(new LinearInterpolator());
         mAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 int value = (int) animation.getAnimatedValue();
                 mCleanSwirlAnimationView.setProgress(value);
+
+                if (value > mNoProvideBubbleLimit && mCleanSwirlAnimationView.isProvidable()) {
+                    mCleanSwirlAnimationView.setProvidable(false);
+                }
 
                 if (value > mScaleProgressLimit) {
                     if (mScaleAnimatorSet == null) {
@@ -196,7 +206,10 @@ public class CleanView extends FrameLayout {
 
     }
 
-    private void startOuterCircleAnimation(){
+    /**
+     * 外部圆圈的动画
+     */
+    private void startOuterCircleAnimation() {
         mOuterCircleAnimatorSet = new AnimatorSet();
         ObjectAnimator scaleXAnimator = ObjectAnimator.ofFloat(mSwirlOuterCircleView, "scaleX", 1, 1.3f);
         scaleXAnimator.setRepeatCount(ValueAnimator.INFINITE);
@@ -302,7 +315,7 @@ public class CleanView extends FrameLayout {
             mSizeAnimator.cancel();
         }
 
-        if(mOuterCircleAnimatorSet !=null){
+        if (mOuterCircleAnimatorSet != null) {
             mOuterCircleAnimatorSet.cancel();
         }
     }

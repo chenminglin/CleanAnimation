@@ -26,6 +26,8 @@ public class CleanSwirlAnimationView extends View {
     //椭圆的转动速率
     float mRate = 1;
 
+    float mRealRate;
+
     //水泡的默认个数
     final int BUBBLE_DEFAULT_NUM = 50;
 
@@ -84,11 +86,13 @@ public class CleanSwirlAnimationView extends View {
 
     float mOuterCircleRadius;
 
+    private boolean isProvidable = true;
+
+    int mMaxProgress;
 
 //    Camera mCamera;
 //    Matrix mMatrix;
 //    float mCameraZ;
-
 
     public CleanSwirlAnimationView(Context context) {
         super(context);
@@ -251,16 +255,21 @@ public class CleanSwirlAnimationView extends View {
         if (progress == 1) {
             resetDegrees();
         }
+        progressToRate(progress);
         Log.d(TAG, "progress = " + progress);
-        mOval1Degrees = OVAL1_DEFAULT_DEGREES + progress * mRate * 0.5f;
-        mOval2Degrees = OVAL2_DEFAULT_DEGREES + progress * mRate * 0.3f;
-        mOval3Degrees = OVAL3_DEFAULT_DEGREES + progress * mRate * 0.7f;
-        mBubbleCanvasDegrees = progress * mRate * 0.3f;
+        mOval1Degrees = OVAL1_DEFAULT_DEGREES + progress * mRealRate * 0.5f;
+        mOval2Degrees = OVAL2_DEFAULT_DEGREES + progress * mRealRate * 0.3f;
+        mOval3Degrees = OVAL3_DEFAULT_DEGREES + progress * mRealRate * 0.7f;
+        mBubbleCanvasDegrees = progress * mRealRate * 0.3f;
         Log.d(TAG, "mOval1Degrees = " + mOval1Degrees);
         Log.d(TAG, "mOval2Degrees = " + mOval2Degrees);
         Log.d(TAG, "mOval3Degrees = " + mOval3Degrees);
 
         postInvalidate();
+    }
+
+    private void progressToRate(int progress) {
+        mRealRate = (mRate * progress * progress ) / 50000f;
     }
 
 
@@ -369,7 +378,9 @@ public class CleanSwirlAnimationView extends View {
                 n++;
             }
         }
-        initBubble();
+        if (isProvidable) {
+            initBubble();
+        }
     }
 
     public void reprovideBubble() {
@@ -392,5 +403,16 @@ public class CleanSwirlAnimationView extends View {
         this.mBubbleNum = bubbleNum;
     }
 
+    public boolean isProvidable() {
+        return isProvidable;
+    }
 
+    public void setProvidable(boolean providable) {
+        isProvidable = providable;
+    }
+
+
+    public void setMaxProgress(int maxProgress) {
+        this.mMaxProgress = maxProgress;
+    }
 }
