@@ -278,13 +278,13 @@ public class CleanView extends FrameLayout {
         long mb = kb * 1024;
         long gb = mb * 1024;
         if (size >= gb) {
-            return new String[]{String.format("%.2f", (float) size / gb), "GB"};
+            return new String[]{String.format("%.1f", (float) size / gb), "GB"};
         } else if (size >= mb) {
             float f = (float) size / mb;
-            return new String[]{String.format(f > 100 ? "%.0f" : "%.2f", f), "MB"};
+            return new String[]{String.format(f > 100 ? "%.0f" : "%.1f", f), "MB"};
         } else if (size >= kb) {
             float f = (float) size / kb;
-            return new String[]{String.format(f > 100 ? "%.0f" : "%.2f", f), "KB"};
+            return new String[]{String.format(f > 100 ? "%.0f" : "%.1f", f), "KB"};
         } else return new String[]{String.format("%d", size), "B"};
     }
 

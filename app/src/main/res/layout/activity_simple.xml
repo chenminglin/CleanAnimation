@@ -4,12 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SimpleActivity">
+    android:background="@color/clean_view_theme"
+    tools:context=".SimpleActivity"
+    android:paddingBottom="60dp">
 
     <com.chenminglin.cleananimation.CleanView
         android:id="@+id/clean_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/clean_view_theme" />
+         />
 
 </FrameLayout>

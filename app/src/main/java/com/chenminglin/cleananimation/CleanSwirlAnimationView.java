@@ -160,8 +160,8 @@ public class CleanSwirlAnimationView extends View {
 
         mCenterCircleRadius = w / 2 * (2.4f / 5);
 
-        mBubbleMaxRadius = w * 0.8f / 100f;
-        mBubbleMinRadius = w * 0.4f / 100f;
+        mBubbleMaxRadius = w * 1.1f / 100f;
+        mBubbleMinRadius = w * 0.3f / 100f;
         mBubbleMinX = -(w / 2 * (4.5f / 5));
         mBubbleMaxX = w / 2 * (4.5f / 5);
         mBubbleMinY = mBubbleMinX;
@@ -280,10 +280,18 @@ public class CleanSwirlAnimationView extends View {
 
     private CleanBubble provideBubble() {
         CleanBubble bubble = new CleanBubble();
-        bubble.cx = randomBubbleCenterX();
-        bubble.cy = provideBubbleCenterY(bubble);
-        bubble.radius = randomBubbleRadius();
-        bubble.decrement = randomBubbleDecrement();
+        int mod = mBubbles.size() % 2;
+        if (mod == 0) {
+            bubble.cx = randomBubbleCenterX();
+            bubble.cy = provideBubbleCenterY(bubble);
+            bubble.radius = randomBubbleRadius();
+            bubble.decrement = randomBubbleDecrement();
+        } else {
+            bubble.cy = randomBubbleCenterY();
+            bubble.cx = provideBubbleCenterX(bubble);
+            bubble.radius = randomBubbleRadius();
+            bubble.decrement = randomBubbleDecrement();
+        }
         return bubble;
     }
 
@@ -297,7 +305,6 @@ public class CleanSwirlAnimationView extends View {
     private float provideBubbleCenterY(CleanBubble bubble) {
         float distance = randomBubbleCenterDistance();
         double absY = Math.sqrt(Math.pow(distance, 2) - Math.pow(Math.abs(bubble.cx), 2));
-
         bubble.distance = distance;
         int i = random.nextInt(2);
         if (i == 0) {
@@ -305,11 +312,27 @@ public class CleanSwirlAnimationView extends View {
         } else {
             return (float) -absY;
         }
+    }
 
+    private float randomBubbleCenterY() {
+        int coordinate = random.nextInt((int) mBubbleMaxY * 2);
+        return coordinate + mBubbleMinY;
+    }
+
+    private float provideBubbleCenterX(CleanBubble bubble) {
+        float distance = randomBubbleCenterDistance();
+        double absX = Math.sqrt(Math.pow(distance, 2) - Math.pow(Math.abs(bubble.cy), 2));
+        bubble.distance = distance;
+        int i = random.nextInt(2);
+        if (i == 0) {
+            return (float) absX;
+        } else {
+            return (float) -absX;
+        }
     }
 
     private float randomBubbleCenterDistance() {
-        int distance = random.nextInt((int) mBubbleMaxX);
+        int distance = random.nextInt((int) mBubbleMaxCenterDistance);
         if (distance < mBubbleMinCenterDistance) {
             return randomBubbleCenterDistance();
         }
@@ -361,11 +384,11 @@ public class CleanSwirlAnimationView extends View {
         return (bubble.distance + bubble.radius) < mCenterCircleRadius;
     }
 
-    public void setRate(float rate){
+    public void setRate(float rate) {
         this.mRate = rate;
     }
 
-    public void setBubbleNum(int bubbleNum){
+    public void setBubbleNum(int bubbleNum) {
         this.mBubbleNum = bubbleNum;
     }
 

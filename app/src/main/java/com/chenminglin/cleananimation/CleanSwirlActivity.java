@@ -25,39 +25,39 @@ public class CleanSwirlActivity extends AppCompatActivity {
             }
         }
 
-//        mView = findViewById(R.id.swirl_animation_view);
-//        mBtnStart = findViewById(R.id.btn_start);
-//
-//        mView.setBubbleNum(mConfig.bubbleNum);
-//        mView.setRate(mConfig.rate);
-//        if (mConfig != null) {
-//            mView.setBubbleNum(mConfig.bubbleNum);
-//            mView.setRate(mConfig.rate);
-//            mBtnStart.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    ValueAnimator valueAnimator = ValueAnimator.ofInt(1,mConfig.drawFrequency);
-//                    valueAnimator.setDuration(mConfig.duration);
-//                    valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-//                        @Override
-//                        public void onAnimationUpdate(ValueAnimator animation) {
-//                            int progress = (int) animation.getAnimatedValue();
-//                            mView.setProgress(progress);
-//                        }
-//                    });
-//                    valueAnimator.start();
-//                }
-//            });
-//        }
+        mView = findViewById(R.id.swirl_animation_view);
+        mBtnStart = findViewById(R.id.btn_start);
+
+        mView.setBubbleNum(mConfig.bubbleNum);
+        mView.setRate(mConfig.rate);
+        if (mConfig != null) {
+            mView.setBubbleNum(mConfig.bubbleNum);
+            mView.setRate(mConfig.rate);
+            mBtnStart.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ValueAnimator valueAnimator = ValueAnimator.ofInt(1,mConfig.drawFrequency);
+                    valueAnimator.setDuration(mConfig.duration);
+                    valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                        @Override
+                        public void onAnimationUpdate(ValueAnimator animation) {
+                            int progress = (int) animation.getAnimatedValue();
+                            mView.setProgress(progress);
+                        }
+                    });
+                    valueAnimator.start();
+                }
+            });
+        }
 
 
-        final MyView myView = findViewById(R.id.myview);
+//        final MyView myView = findViewById(R.id.myview);
 
         SeekBar seekBar = findViewById(R.id.seekbar);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                myView.setProgress(progress);
+                mView.setProgress(progress);
             }
 
             @Override
