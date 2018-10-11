@@ -1,13 +1,15 @@
 package com.chenminglin.cleananimation;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.View;
 
+/**
+ * 旋转动画外部圆圈，此类本身没有动画，只是画了一个圆圈，动画由外部view控制
+ */
 public class CleanSwirlOuterRippleView extends View {
     final String TAG = getClass().getSimpleName();
     float centerX;
@@ -35,10 +37,7 @@ public class CleanSwirlOuterRippleView extends View {
 
     private void init(AttributeSet attrs, int defStyle) {
         // Load attributes
-        final TypedArray a = getContext().obtainStyledAttributes(
-                attrs, R.styleable.CleanCircleRippleView, defStyle, 0);
 
-        a.recycle();
 
         // Set up a default TextPaint object
         initPaint();

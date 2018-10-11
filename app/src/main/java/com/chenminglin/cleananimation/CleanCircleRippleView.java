@@ -2,12 +2,10 @@ package com.chenminglin.cleananimation;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 
@@ -15,17 +13,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TODO: document your custom view class.
+ * 奖杯外圆圈的浮动效果，刚开始的策略时显示五个，每面发现去掉里面几个就可以。
  */
 public class CleanCircleRippleView extends View {
 
     final String TAG = getClass().getSimpleName();
-
+    //中心x坐标
     float centerX;
+    //中心y坐标
     float centerY;
-
+    //扩散最大半径
     float mRippleMaxRadius;
+    //每个圆圈的间距
     float mRippleInterval;
+    //圆圈向外扩散递增幅度
     float mRippleRadiusDecrement;
     final int RIPPLES_SIZE = 5;
 
@@ -37,6 +38,7 @@ public class CleanCircleRippleView extends View {
 
     long maxprogress = 100;
 
+    ValueAnimator animator;
 
     public CleanCircleRippleView(Context context) {
         super(context);
@@ -55,10 +57,7 @@ public class CleanCircleRippleView extends View {
 
     private void init(AttributeSet attrs, int defStyle) {
         // Load attributes
-        final TypedArray a = getContext().obtainStyledAttributes(
-                attrs, R.styleable.CleanCircleRippleView, defStyle, 0);
 
-        a.recycle();
 
         // Set up a default TextPaint object
         initPaint();
@@ -66,7 +65,7 @@ public class CleanCircleRippleView extends View {
 
     private void initPaint() {
         mPaint = new Paint();
-        mPaint.setColor(Color.parseColor("#ffffff"));
+        mPaint.setColor(Color.WHITE);
         mPaint.setAntiAlias(true);
     }
 
@@ -103,6 +102,7 @@ public class CleanCircleRippleView extends View {
     }
 
     private void drawRipple(Canvas canvas) {
+        //里面几个不需要显示
         for (int n = 3; n < ripples.size(); n++) {
             CircleRipple ripple = ripples.get(n);
             float alpha = ripple.radius / mRippleMaxRadius;
@@ -126,7 +126,7 @@ public class CleanCircleRippleView extends View {
 
 
     public void startAnimation() {
-        ValueAnimator animator = ValueAnimator.ofInt(1, (int) maxprogress);
+        animator = ValueAnimator.ofInt(1, (int) maxprogress);
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -142,8 +142,14 @@ public class CleanCircleRippleView extends View {
         animator.start();
     }
 
+    public void cancelAnimation() {
+        if (animator != null) {
+            animator.cancel();
+            animator = null;
+        }
+    }
 
-    class CircleRipple {
+    public class CircleRipple {
         public int radius;
         public int initRadius;
     }

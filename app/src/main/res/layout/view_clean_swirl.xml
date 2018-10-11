@@ -24,6 +24,7 @@
         app:themeColor="@color/clean_view_theme" />
 
     <RelativeLayout
+
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center">
@@ -37,6 +38,7 @@
             tools:text="40.12" />
 
         <LinearLayout
+            android:id="@+id/layout_size_unit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/txt_size"

@@ -15,6 +15,9 @@ import java.util.List;
 import java.util.Random;
 
 
+/**
+ * 旋转动画
+ */
 public class CleanSwirlAnimationView extends View {
     final String TAG = getClass().getSimpleName();
 
@@ -23,18 +26,26 @@ public class CleanSwirlAnimationView extends View {
     final float OVAL1_DEFAULT_DEGREES = -15F;
     final float OVAL2_DEFAULT_DEGREES = -60F;
     final float OVAL3_DEFAULT_DEGREES = -100F;
+
+    Paint mPaint;
+    int mCenterX;
+    int mCenterY;
+
     //椭圆的转动速率
     float mRate = 1;
-
     float mRealRate;
 
     //水泡的默认个数
     final int BUBBLE_DEFAULT_NUM = 50;
 
-    //水泡的最大半径
-    float mBubbleMaxRadius = 0;
-    //水泡的最小半径
-    float mBubbleMinRadius = 0;
+
+    //水泡半径
+    float[] mBubbleRadiuses;
+    //水泡中心距离
+    float[] mBubbleCenterDistance;
+    //水泡中心距离递减值
+    int[] mBubbleDecrement;
+
     //水泡离中心点的最小x坐标
     float mBubbleMinX = 0;
     //水泡离中心点的最大x坐标
@@ -43,21 +54,11 @@ public class CleanSwirlAnimationView extends View {
     float mBubbleMinY = 0;
     //水泡离中心点的最大Y坐标
     float mBubbleMaxY = 0;
-    //水泡中心最小距离
-    float mBubbleMinCenterDistance;
-    //水泡中心最大距离
-    float mBubbleMaxCenterDistance;
+    //画水泡的画布的角度
+    float mBubbleCanvasDegrees;
     //水泡的个数
     int mBubbleNum;
-
     List<CleanBubble> mBubbles = new ArrayList<>();
-
-    Paint mPaint;
-
-    int mCenterX;
-    int mCenterY;
-
-    int mOuterCircleColor = Color.parseColor("#20FFFFFF");
 
 
     int mOval1Color = Color.parseColor("#43FFFFFF");
@@ -71,21 +72,14 @@ public class CleanSwirlAnimationView extends View {
     RectF mOval3 = new RectF();
     float mOval3Degrees = OVAL3_DEFAULT_DEGREES;
 
-    int mBubbleColor = Color.parseColor("#7FFFFFFF");
+    int mBubbleColor = Color.WHITE;
 
     //中心圈的半径
     float mCenterCircleRadius;
     //中心圈的颜色
     int mCenterCircleColor;
-    //画水泡的画布的角度
-    float mBubbleCanvasDegrees;
-    //水泡收缩递减最大值
-    int mMaxDecrement;
-    //水泡收缩递减最小值
-    int mMinDecrement;
 
-    float mOuterCircleRadius;
-
+    //用于判断是否还继续生成水泡
     private boolean isProvidable = true;
 
     int mMaxProgress;
@@ -144,11 +138,8 @@ public class CleanSwirlAnimationView extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-
         mCenterX = w / 2;
         mCenterY = h / 2;
-
-        mOuterCircleRadius = w / 2 * (3.4f / 5);
 
         float oval1Left = w / 2 * (2.9f / 5);
         float oval1Top = w / 2 * (2.45f / 5);
@@ -164,19 +155,14 @@ public class CleanSwirlAnimationView extends View {
 
         mCenterCircleRadius = w / 2 * (2.4f / 5);
 
-        mBubbleMaxRadius = w * 1.1f / 100f;
-        mBubbleMinRadius = w * 0.3f / 100f;
         mBubbleMinX = -(w / 2 * (4.5f / 5));
         mBubbleMaxX = w / 2 * (4.5f / 5);
         mBubbleMinY = mBubbleMinX;
         mBubbleMaxY = mBubbleMaxX;
 
-        mBubbleMinCenterDistance = w / 2 * (3.9f / 5);
-        mBubbleMaxCenterDistance = w / 2 * (4.3f / 5);
-
-
-        mMaxDecrement = (int) (w / 100f);
-        mMinDecrement = (int) (w * 0.5f / 100f);
+        mBubbleRadiuses = new float[]{w * 1.1f / 100f, w * 0.7f / 100f, w * 0.3f / 100f};
+        mBubbleCenterDistance = new float[]{w / 2 * (4.3f / 5), w / 2 * (4.5f / 5), w / 2 * (4.7f / 5)};
+        mBubbleDecrement = new int[]{w / 80, w / 160};
 
         initBubble();
     }
@@ -236,13 +222,13 @@ public class CleanSwirlAnimationView extends View {
         canvas.drawCircle(0, 0, mCenterCircleRadius, mPaint);
         canvas.restore();
 
-
-//        canvas.rotate(mCanvasDegrees);
-
         long endTime = System.currentTimeMillis();
-        Log.d(TAG, "draw time = " + (endTime - startTime));
+        Log.d(TAG,  "draw time = " + (endTime - startTime));
     }
 
+    /**
+     * 重置角度
+     */
     private void resetDegrees() {
         mOval1Degrees = OVAL1_DEFAULT_DEGREES;
         mOval2Degrees = OVAL2_DEFAULT_DEGREES;
@@ -251,28 +237,41 @@ public class CleanSwirlAnimationView extends View {
     }
 
 
+    /**
+     * 动画进度设置
+     * @param progress
+     */
     public void setProgress(int progress) {
         if (progress == 1) {
             resetDegrees();
         }
         progressToRate(progress);
         Log.d(TAG, "progress = " + progress);
+        //后面浮点差值时用于戳开三个椭圆的旋转的角度
         mOval1Degrees = OVAL1_DEFAULT_DEGREES + progress * mRealRate * 0.5f;
         mOval2Degrees = OVAL2_DEFAULT_DEGREES + progress * mRealRate * 0.3f;
         mOval3Degrees = OVAL3_DEFAULT_DEGREES + progress * mRealRate * 0.7f;
         mBubbleCanvasDegrees = progress * mRealRate * 0.3f;
-        Log.d(TAG, "mOval1Degrees = " + mOval1Degrees);
+        Log.d(TAG,"mOval1Degrees = " + mOval1Degrees);
         Log.d(TAG, "mOval2Degrees = " + mOval2Degrees);
         Log.d(TAG, "mOval3Degrees = " + mOval3Degrees);
 
         postInvalidate();
     }
 
+    /**
+     * 通过转换算出真实的速率，progress^2是为了速度递增加速，一开始慢，后面会很快，可以达到这个效果
+     * 60000f是随便取的一个值
+     * @param progress
+     */
     private void progressToRate(int progress) {
-        mRealRate = (mRate * progress * progress ) / 60000f;
+        mRealRate = (mRate * progress * progress) / 60000f;
     }
 
 
+    /**
+     * 初始化水泡
+     */
     private void initBubble() {
         if (mBubbles.size() > mBubbleNum) {
             return;
@@ -287,30 +286,42 @@ public class CleanSwirlAnimationView extends View {
         Log.d(TAG, "init bubble time = " + (endTime - startTime));
     }
 
+    /**
+     * 生成水泡
+     * @return
+     */
     private CleanBubble provideBubble() {
         CleanBubble bubble = new CleanBubble();
         int mod = mBubbles.size() % 2;
-        if (mod == 0) {
+        if (mod == 0) {//两种生成中心坐标方式，这样水泡分布会更加均匀
             bubble.cx = randomBubbleCenterX();
             bubble.cy = provideBubbleCenterY(bubble);
-            bubble.radius = randomBubbleRadius();
-            bubble.decrement = randomBubbleDecrement();
         } else {
             bubble.cy = randomBubbleCenterY();
             bubble.cx = provideBubbleCenterX(bubble);
-            bubble.radius = randomBubbleRadius();
-            bubble.decrement = randomBubbleDecrement();
         }
+        bubble.radius = randomBubbleRadius();
+        bubble.initDistance = bubble.distance;
+        bubble.decrement = randomBubbleDecrement();
         return bubble;
     }
 
     Random random = new Random(System.currentTimeMillis());
 
+    /**
+     * 随机生成水泡中心x坐标
+     * @return 中心x坐标
+     */
     private float randomBubbleCenterX() {
         int coordinate = random.nextInt((int) mBubbleMaxX * 2);
         return coordinate + mBubbleMinX;
     }
 
+    /**
+     * 根据随机中心距离，生成中心y坐标
+     * @param bubble
+     * @return 中心y坐标
+     */
     private float provideBubbleCenterY(CleanBubble bubble) {
         float distance = randomBubbleCenterDistance();
         double absY = Math.sqrt(Math.pow(distance, 2) - Math.pow(Math.abs(bubble.cx), 2));
@@ -340,45 +351,62 @@ public class CleanSwirlAnimationView extends View {
         }
     }
 
+    /**
+     * 随机生成水泡中心距离
+     * @return
+     */
     private float randomBubbleCenterDistance() {
-        int distance = random.nextInt((int) mBubbleMaxCenterDistance);
-        if (distance < mBubbleMinCenterDistance) {
-            return randomBubbleCenterDistance();
-        }
-        return distance;
+        int distanceIndex = random.nextInt(3);
+        return mBubbleCenterDistance[distanceIndex];
     }
 
+    /**
+     * 随机生成水泡半径
+     * @return
+     */
     private float randomBubbleRadius() {
-        int radius = random.nextInt((int) mBubbleMaxRadius);
-        if (radius < mBubbleMinRadius) {
-            return randomBubbleRadius();
-        }
-        return radius;
+        int radiusIndex = random.nextInt(3);
+        return mBubbleRadiuses[radiusIndex];
     }
 
+    /**
+     * 随机生成水泡往内聚起来的递减幅度，让每个水泡没有统一速度往里面靠。
+     * @return
+     */
     private int randomBubbleDecrement() {
-        int decrement = random.nextInt(mMaxDecrement);
-        if (decrement < mMinDecrement) {
-            return randomBubbleDecrement();
-        }
-        return decrement;
+        int decrementIndex = random.nextInt(2);
+        return mBubbleDecrement[decrementIndex];
     }
 
+    /**
+     * 画所有的水泡，水泡一开始透明的为0，越靠里面，透明度越大。
+     * @param canvas
+     * @param paint
+     */
     private void drawBubbles(Canvas canvas, Paint paint) {
         mPaint.setColor(Color.WHITE);
         int n = 0;
         while (n < mBubbles.size()) {
             CleanBubble bubble = mBubbles.get(n);
+            float a = bubble.distance - mCenterCircleRadius;
+            float b = bubble.initDistance - mCenterCircleRadius;
+            int alpha = (int) (255 * (1 - (a / b)));
+            paint.setAlpha(alpha);
             canvas.drawCircle(bubble.cx, bubble.cy, bubble.radius, paint);
 //            Log.d(TAG, "bubble = " + bubble);
             bubble.decrease();
+            //已经移动到里面的水泡需要移除
             if (isBubbleInCenterCircle(bubble)) {
                 mBubbles.remove(bubble);
             } else {
                 n++;
             }
         }
+        /**
+         * 如果已经不再生成水泡，则不需要继续生成，不再生成时机参考{@link CleanSwirlAnimationView#setProvidable(boolean)}
+         */
         if (isProvidable) {
+            //移除后的水泡需要重新生成
             initBubble();
         }
     }
@@ -389,6 +417,11 @@ public class CleanSwirlAnimationView extends View {
         postInvalidate();
     }
 
+    /**
+     * 判断水泡是否在中心圆圈内
+     * @param bubble
+     * @return
+     */
     private boolean isBubbleInCenterCircle(CleanBubble bubble) {
         //勾股定理算出中心和原点的距离
 //        double centerDistance = Math.sqrt(Math.pow(Math.abs(bubble.cx), 2) + Math.pow(Math.abs(bubble.cy), 2));

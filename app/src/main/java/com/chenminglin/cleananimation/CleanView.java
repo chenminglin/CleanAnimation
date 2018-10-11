@@ -5,43 +5,70 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.animation.AccelerateInterpolator;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.HashSet;
+import java.util.Set;
 
+
+/**
+ * 清理动画最外层视图，这个视图包括前面旋转动画部分{@link CleanView#mSwirlLayout}，
+ * 和后面的奖杯动画{@link CleanView#mTrophyLayout}
+ */
 public class CleanView extends FrameLayout {
 
     final String TAG = getClass().getSimpleName();
 
-    View mSwirlView;
-    View mSwirlOuterCircleView;
-    View mTrophyView;
+    //清理动画数字为垃圾缓存
+    public final static int CLEAN_TYPE_JUNK = 0;
+    //清理动画数字为百分比
+    public final static int CLEAN_TYPE_PERCENTAGE = 1;
+
+    int cleanType;
+
+
+    //旋转动画视图布局，为了方便旋转动画结束后统一缩放效果
+    View mSwirlLayout;
+    //旋转动画视图
     CleanSwirlAnimationView mCleanSwirlAnimationView;
+    View mSwirlOuterCircleView;
+
+    //缓存或者数字
     TextView mTvSize;
     TextView mTvUnit;
+    LinearLayout mLayoutSizeUnit;
 
-    RelativeLayout mLayoutTrophy;
+    //奖杯视图布局
+    RelativeLayout mTrophyLayout;
+    //奖杯视图
+    View mTrophyView;
     ImageView mStar1;
     ImageView mStar2;
     ImageView mStar3;
     TextView mTvFinish;
     CleanCircleRippleView mRippleView;
 
-    ValueAnimator mAnimator;
+    //旋转动画
+    ValueAnimator mSwirlAnimator;
+    //旋转动画布局缩放动画
     AnimatorSet mScaleAnimatorSet;
+    //清理缓存递减动画
     ValueAnimator mSizeAnimator;
-
+    //清理百分比递增缓存动画
+    ValueAnimator mPercentageAnimator;
+    //旋转动画外部圆圈扩散动画
     AnimatorSet mOuterCircleAnimatorSet;
+    //奖杯旁边星星动画
+    Set<Animator> startAnimators = new HashSet<>();
 
     int mMaxProgress;
 
@@ -79,14 +106,8 @@ public class CleanView extends FrameLayout {
 
     private void init(AttributeSet attrs, int defStyle) {
         // Load attributes
-        final TypedArray a = getContext().obtainStyledAttributes(
-                attrs, R.styleable.CleanView, defStyle, 0);
-
-
-        a.recycle();
-
-        mSwirlView = LayoutInflater.from(getContext()).inflate(R.layout.view_clean_swirl, null);
-        addView(mSwirlView);
+        mSwirlLayout = LayoutInflater.from(getContext()).inflate(R.layout.view_clean_swirl, null);
+        addView(mSwirlLayout);
 
         mTrophyView = LayoutInflater.from(getContext()).inflate(R.layout.view_trophy, null);
         addView(mTrophyView);
@@ -95,9 +116,9 @@ public class CleanView extends FrameLayout {
         mSwirlOuterCircleView = findViewById(R.id.swirl_outer_ripple_view);
         mTvSize = findViewById(R.id.txt_size);
         mTvUnit = findViewById(R.id.txt_unit);
+        mLayoutSizeUnit = findViewById(R.id.layout_size_unit);
 
-
-        mLayoutTrophy = findViewById(R.id.layout_trophy);
+        mTrophyLayout = findViewById(R.id.layout_trophy);
 
         mStar1 = findViewById(R.id.star1);
         mStar2 = findViewById(R.id.star2);
@@ -108,20 +129,16 @@ public class CleanView extends FrameLayout {
     }
 
 
-    public void startAnimation(final long duration, int maxProgress) throws Exception {
-        if (mJunkSize <= 0) {
-            throw new Exception("垃圾空间大小没有设置");
-        }
-
+    public void startAnimation(final long duration, int maxProgress) {
         mMaxProgress = maxProgress;
         mCleanSwirlAnimationView.setMaxProgress(maxProgress);
         mScaleProgressLimit = (int) (maxProgress / 10f * 9);
-        mNoProvideBubbleLimit = (int) (maxProgress / 10f * 4);
-        mAnimator = ValueAnimator.ofInt(1, maxProgress);
-        mAnimator.setDuration(duration);
-        mAnimator.setRepeatMode(ValueAnimator.REVERSE);
-        mAnimator.setInterpolator(new LinearInterpolator());
-        mAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+        mNoProvideBubbleLimit = (int) (maxProgress / 20f * 9);
+        mSwirlAnimator = ValueAnimator.ofInt(1, maxProgress);
+        mSwirlAnimator.setDuration(duration);
+        mSwirlAnimator.setRepeatMode(ValueAnimator.REVERSE);
+        mSwirlAnimator.setInterpolator(new LinearInterpolator());
+        mSwirlAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 int value = (int) animation.getAnimatedValue();
@@ -134,9 +151,9 @@ public class CleanView extends FrameLayout {
                 if (value > mScaleProgressLimit) {
                     if (mScaleAnimatorSet == null) {
                         mScaleAnimatorSet = new AnimatorSet();
-                        ObjectAnimator scaleXAnimator = ObjectAnimator.ofFloat(mSwirlView, "scaleX", 1, 0.3f);
-                        ObjectAnimator scaleYAnimator = ObjectAnimator.ofFloat(mSwirlView, "scaleY", 1, 0.3f);
-                        ObjectAnimator alphaAnimator = ObjectAnimator.ofFloat(mSwirlView, "alpha", 1, 0f);
+                        ObjectAnimator scaleXAnimator = ObjectAnimator.ofFloat(mSwirlLayout, "scaleX", 1, 0.3f);
+                        ObjectAnimator scaleYAnimator = ObjectAnimator.ofFloat(mSwirlLayout, "scaleY", 1, 0.3f);
+                        ObjectAnimator alphaAnimator = ObjectAnimator.ofFloat(mSwirlLayout, "alpha", 1, 0f);
 
                         long currentTime = System.currentTimeMillis();
                         long timeLeft = duration - (currentTime - mAmimationStartTime);
@@ -153,7 +170,7 @@ public class CleanView extends FrameLayout {
         });
 
 
-        mAnimator.addListener(new Animator.AnimatorListener() {
+        mSwirlAnimator.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
                 mAmimationStartTime = System.currentTimeMillis();
@@ -164,8 +181,8 @@ public class CleanView extends FrameLayout {
                 startTrophyAnimation();
                 mOuterCircleAnimatorSet.cancel();
                 mOuterCircleAnimatorSet = null;
-                removeView(mSwirlView);
-                mSwirlView = null;
+                removeView(mSwirlLayout);
+                mSwirlLayout = null;
             }
 
             @Override
@@ -177,10 +194,14 @@ public class CleanView extends FrameLayout {
 
             }
         });
-        mAnimator.start();
+        mSwirlAnimator.start();
 
         long duration2 = duration / 10 * 9;
-        startSizeAnimation(duration2);
+        if (cleanType == CLEAN_TYPE_JUNK) {
+            startSizeAnimation(duration2);
+        } else {
+            startPercentageAnimation(duration2);
+        }
         startOuterCircleAnimation();
     }
 
@@ -190,6 +211,7 @@ public class CleanView extends FrameLayout {
      * @param duration
      */
     private void startSizeAnimation(long duration) {
+        mLayoutSizeUnit.setVisibility(VISIBLE);
         mSizeAnimator = ValueAnimator.ofFloat(mJunkSize, 0);
         mSizeAnimator.setDuration(duration);
         mSizeAnimator.setRepeatMode(ValueAnimator.REVERSE);
@@ -205,7 +227,29 @@ public class CleanView extends FrameLayout {
         });
         mSizeAnimator.setInterpolator(new LinearInterpolator());
         mSizeAnimator.start();
+    }
 
+    /**
+     * 清理百分比进度
+     *
+     * @param duration
+     */
+    private void startPercentageAnimation(long duration) {
+        mLayoutSizeUnit.setVisibility(VISIBLE);
+        mPercentageAnimator = ValueAnimator.ofInt(0, 100);
+        mPercentageAnimator.setDuration(duration);
+        mPercentageAnimator.setRepeatMode(ValueAnimator.REVERSE);
+        mPercentageAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                int percent = (int) animation.getAnimatedValue();
+
+
+                mTvSize.setText(String.format("%d%%", percent));
+            }
+        });
+        mPercentageAnimator.setInterpolator(new LinearInterpolator());
+        mPercentageAnimator.start();
     }
 
     /**
@@ -273,15 +317,15 @@ public class CleanView extends FrameLayout {
         mTrophyView.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if(mOnCleanAnimationListener != null){
+                if (mOnCleanAnimationListener != null) {
                     mOnCleanAnimationListener.onFinish();
                 }
             }
-        },1200);
+        }, 1200);
     }
 
     /**
-     * 星星动画
+     * 奖杯的星星动画
      *
      * @param view
      * @param duration
@@ -292,6 +336,7 @@ public class CleanView extends FrameLayout {
         alphaAnimator.setDuration(duration);
         alphaAnimator.setRepeatMode(ValueAnimator.RESTART);
         alphaAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        startAnimators.add(alphaAnimator);
         return alphaAnimator;
     }
 
@@ -316,9 +361,12 @@ public class CleanView extends FrameLayout {
         this.mJunkSize = size;
     }
 
+    /**
+     * 取消所有动画
+     */
     public void cancelAnimation() {
-        if (mAnimator != null) {
-            mAnimator.cancel();
+        if (mSwirlAnimator != null) {
+            mSwirlAnimator.cancel();
         }
 
         if (mSizeAnimator != null) {
@@ -328,10 +376,24 @@ public class CleanView extends FrameLayout {
         if (mOuterCircleAnimatorSet != null) {
             mOuterCircleAnimatorSet.cancel();
         }
+
+        if (mScaleAnimatorSet != null) {
+            mScaleAnimatorSet.cancel();
+            mScaleAnimatorSet = null;
+        }
+
+        if (mRippleView != null) {
+            mRippleView.cancelAnimation();
+            mRippleView = null;
+        }
+
+        for (Animator animator : startAnimators) {
+            animator.cancel();
+        }
     }
 
     public ValueAnimator getAnimator() {
-        return mAnimator;
+        return mSwirlAnimator;
     }
 
     public void setRate(float rate) {
@@ -342,12 +404,18 @@ public class CleanView extends FrameLayout {
         this.mCleanSwirlAnimationView.setBubbleNum(bubbleNum);
     }
 
-    public void setOnCleanAnimationListener(OnCleanAnimationListener listener){
+    public void setOnCleanAnimationListener(OnCleanAnimationListener listener) {
         this.mOnCleanAnimationListener = listener;
     }
 
-    interface OnCleanAnimationListener{
+    /**
+     * 清理动画进度回调
+     */
+    public interface OnCleanAnimationListener {
         void onFinish();
     }
 
+    public void setCleanType(int cleanType) {
+        this.cleanType = cleanType;
+    }
 }

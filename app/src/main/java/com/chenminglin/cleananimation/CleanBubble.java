@@ -2,12 +2,21 @@ package com.chenminglin.cleananimation;
 
 import java.util.UUID;
 
+/**
+ * 用于记录外边小点点
+ */
 public class CleanBubble {
     public String id = UUID.randomUUID().toString();
+    //中心x坐标
     public float cx;
+    //中心y坐标
     public float cy;
+    //半径
     public float radius;
+    //中心距离
     public float distance;
+    //保存初始化时的中心距离，用于计算其透明度
+    public float initDistance;
     //递减幅度
     public int decrement;
 
