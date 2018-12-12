@@ -22,7 +22,17 @@ public class ExampleUnitTest {
 
         System.out.println(Math.tan(90));
 
-        System.out.println(Math.pow(3,3));
+        System.out.println(Math.pow(3, 3));
 
-     }
+        Random random = new Random(System.currentTimeMillis());
+
+        int n = 0;
+        while (n < 9999) {
+            int i = random.nextInt(10);
+            System.out.println(i);
+            n++;
+        }
+
+
+    }
 }

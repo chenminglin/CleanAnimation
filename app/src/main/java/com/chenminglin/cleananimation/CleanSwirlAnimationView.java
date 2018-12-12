@@ -5,6 +5,8 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -28,6 +30,7 @@ public class CleanSwirlAnimationView extends View {
     final float OVAL3_DEFAULT_DEGREES = -100F;
 
     Paint mPaint;
+    Paint mCenterCirclePaint;
     int mCenterX;
     int mCenterY;
 
@@ -107,6 +110,7 @@ public class CleanSwirlAnimationView extends View {
     }
 
     private void init(AttributeSet attrs, int defStyle) {
+        setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         // Load attributes
         final TypedArray a = getContext().obtainStyledAttributes(
                 attrs, R.styleable.CleanSwirlAnimationView, defStyle, 0);
@@ -132,6 +136,10 @@ public class CleanSwirlAnimationView extends View {
     private void initPaint() {
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
+
+        mCenterCirclePaint = new Paint();
+        mCenterCirclePaint.setAntiAlias(true);
+        mCenterCirclePaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
 
     }
 
@@ -218,12 +226,11 @@ public class CleanSwirlAnimationView extends View {
 
         //画中间的绿色圆圈
         canvas.save();
-        mPaint.setColor(mCenterCircleColor);
-        canvas.drawCircle(0, 0, mCenterCircleRadius, mPaint);
+        canvas.drawCircle(0, 0, mCenterCircleRadius, mCenterCirclePaint);
         canvas.restore();
 
         long endTime = System.currentTimeMillis();
-        Log.d(TAG,  "draw time = " + (endTime - startTime));
+        Log.d(TAG, "draw time = " + (endTime - startTime));
     }
 
     /**
@@ -239,6 +246,7 @@ public class CleanSwirlAnimationView extends View {
 
     /**
      * 动画进度设置
+     *
      * @param progress
      */
     public void setProgress(int progress) {
@@ -252,7 +260,7 @@ public class CleanSwirlAnimationView extends View {
         mOval2Degrees = OVAL2_DEFAULT_DEGREES + progress * mRealRate * 0.3f;
         mOval3Degrees = OVAL3_DEFAULT_DEGREES + progress * mRealRate * 0.7f;
         mBubbleCanvasDegrees = progress * mRealRate * 0.3f;
-        Log.d(TAG,"mOval1Degrees = " + mOval1Degrees);
+        Log.d(TAG, "mOval1Degrees = " + mOval1Degrees);
         Log.d(TAG, "mOval2Degrees = " + mOval2Degrees);
         Log.d(TAG, "mOval3Degrees = " + mOval3Degrees);
 
@@ -262,10 +270,11 @@ public class CleanSwirlAnimationView extends View {
     /**
      * 通过转换算出真实的速率，progress^2是为了速度递增加速，一开始慢，后面会很快，可以达到这个效果
      * 60000f是随便取的一个值
+     *
      * @param progress
      */
     private void progressToRate(int progress) {
-        mRealRate = (mRate * progress * progress) / 60000f;
+        mRealRate = (mRate * progress * progress * progress) / 300000f;
     }
 
 
@@ -288,6 +297,7 @@ public class CleanSwirlAnimationView extends View {
 
     /**
      * 生成水泡
+     *
      * @return
      */
     private CleanBubble provideBubble() {
@@ -310,6 +320,7 @@ public class CleanSwirlAnimationView extends View {
 
     /**
      * 随机生成水泡中心x坐标
+     *
      * @return 中心x坐标
      */
     private float randomBubbleCenterX() {
@@ -319,6 +330,7 @@ public class CleanSwirlAnimationView extends View {
 
     /**
      * 根据随机中心距离，生成中心y坐标
+     *
      * @param bubble
      * @return 中心y坐标
      */
@@ -353,6 +365,7 @@ public class CleanSwirlAnimationView extends View {
 
     /**
      * 随机生成水泡中心距离
+     *
      * @return
      */
     private float randomBubbleCenterDistance() {
@@ -362,6 +375,7 @@ public class CleanSwirlAnimationView extends View {
 
     /**
      * 随机生成水泡半径
+     *
      * @return
      */
     private float randomBubbleRadius() {
@@ -371,6 +385,7 @@ public class CleanSwirlAnimationView extends View {
 
     /**
      * 随机生成水泡往内聚起来的递减幅度，让每个水泡没有统一速度往里面靠。
+     *
      * @return
      */
     private int randomBubbleDecrement() {
@@ -380,6 +395,7 @@ public class CleanSwirlAnimationView extends View {
 
     /**
      * 画所有的水泡，水泡一开始透明的为0，越靠里面，透明度越大。
+     *
      * @param canvas
      * @param paint
      */
@@ -419,6 +435,7 @@ public class CleanSwirlAnimationView extends View {
 
     /**
      * 判断水泡是否在中心圆圈内
+     *
      * @param bubble
      * @return
      */

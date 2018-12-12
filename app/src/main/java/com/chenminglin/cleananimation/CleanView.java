@@ -133,7 +133,7 @@ public class CleanView extends FrameLayout {
         mMaxProgress = maxProgress;
         mCleanSwirlAnimationView.setMaxProgress(maxProgress);
         mScaleProgressLimit = (int) (maxProgress / 10f * 9);
-        mNoProvideBubbleLimit = (int) (maxProgress / 20f * 9);
+        mNoProvideBubbleLimit = (int) (maxProgress / 20f * 11);
         mSwirlAnimator = ValueAnimator.ofInt(1, maxProgress);
         mSwirlAnimator.setDuration(duration);
         mSwirlAnimator.setRepeatMode(ValueAnimator.REVERSE);
@@ -303,7 +303,9 @@ public class CleanView extends FrameLayout {
                 provideStarAnimator(mStar2, 800).start();
                 provideStarAnimator(mStar3, 700).start();
 
-                mRippleView.startAnimation();
+                if (mRippleView != null) {
+                    mRippleView.startAnimation();
+                }
             }
 
             @Override

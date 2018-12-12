@@ -29,7 +29,7 @@ public class SimpleActivity extends AppCompatActivity {
             cleanView.setBubbleNum(mConfig.bubbleNum);
             cleanView.setRate(mConfig.rate);
             try {
-                cleanView.startAnimation(mConfig.duration, mConfig.drawFrequency);
+                cleanView.startAnimation(mConfig.duration, 200);
             } catch (Exception e) {
                 e.printStackTrace();
             }

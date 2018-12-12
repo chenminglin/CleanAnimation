@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -19,6 +21,9 @@ public class CleanSwirlOuterRippleView extends View {
     int mOuterCircleColor = Color.parseColor("#40FFFFFF");
 
     float mCenterCircleRadius;
+
+    Paint mCenterCirclePaint;
+    float mCenterTransCircleRadius;
 
     public CleanSwirlOuterRippleView(Context context) {
         super(context);
@@ -47,6 +52,10 @@ public class CleanSwirlOuterRippleView extends View {
         mPaint = new Paint();
         mPaint.setColor(mOuterCircleColor);
         mPaint.setAntiAlias(true);
+
+        mCenterCirclePaint = new Paint();
+        mCenterCirclePaint.setAntiAlias(true);
+        mCenterCirclePaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
     }
 
     @Override
@@ -56,6 +65,8 @@ public class CleanSwirlOuterRippleView extends View {
         centerX = w / 2;
         centerY = h / 2;
         mCenterCircleRadius = w / 2 * (2.8f / 5);
+
+        mCenterTransCircleRadius = w / 2 * (2.4f / 5);
     }
 
     @Override
@@ -63,5 +74,6 @@ public class CleanSwirlOuterRippleView extends View {
         super.onDraw(canvas);
         canvas.translate(centerX, centerY);
         canvas.drawCircle(0, 0, mCenterCircleRadius, mPaint);
+        canvas.drawCircle(0, 0, mCenterTransCircleRadius, mCenterCirclePaint);
     }
 }
